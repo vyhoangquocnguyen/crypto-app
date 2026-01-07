@@ -1,5 +1,5 @@
 import { fetcher } from "@/lib/coingecko.actions";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,13 +24,14 @@ const columns: DataTableColumn<TrendingCoin>[] = [
     cellClassName: "name-cell",
     cell: (coin) => {
       const item = coin.item;
-      const isTrendingUp = item.data.price_change_percentage_24h.usd > 0;
+      const priceChange = item.data?.price_change_percentage_24h?.usd ?? 0;
+      const isTrendingUp = priceChange > 0;
 
       return (
         <div className={cn("price-change", isTrendingUp ? "text-green-500" : "text-red-500")}>
           <p>
             {isTrendingUp ? <TrendingUp width={16} height={16} /> : <TrendingDown width={16} height={16} />}
-            {Math.abs(item.data.price_change_percentage_24h.usd).toFixed(2)}%
+            {Math.abs(priceChange).toFixed(2)}%
           </p>
         </div>
       );
@@ -41,15 +42,15 @@ const columns: DataTableColumn<TrendingCoin>[] = [
     cellClassName: "price-cell",
     cell: (coin) => {
       const item = coin.item;
-      return item.data.price;
+      return formatCurrency(item.data?.price ?? 0);
     },
   },
 ];
 export async function TrendingCoin() {
-  const trendingCoins = await fetcher<{ coins: TrendingCoin[] }>("search/trending", undefined, 300);
+  const trendingCoins = await fetcher<{ coins: TrendingCoin[] }>("search/trending", undefined, 6000);
 
   return (
-    <div id="#trending-coins">
+    <div id="trending-coins">
       <p>Trending Coins</p>
       <DataTable
         data={trendingCoins.coins.slice(0, 6) || []}

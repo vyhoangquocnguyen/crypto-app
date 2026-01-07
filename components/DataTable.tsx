@@ -26,7 +26,13 @@ const DataTable = <T,>({
       <TableHeader className={headerClassName}>
         <TableRow className={cn("hover:bg-transparent!", headerRowClassName)}>
           {columns.map((column, index) => (
-            <TableHead key={index} className={cn("bg-dark-400 text-purple-100 py-4 first:pl-5 last:pr-5")}>
+            <TableHead
+              key={index}
+              className={cn(
+                "bg-dark-400 text-purple-100 py-4 first:pl-5 last:pr-5",
+                column.headClassName,
+                headerCellClassName
+              )}>
               {column.header}
             </TableHead>
           ))}
