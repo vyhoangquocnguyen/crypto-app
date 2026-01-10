@@ -6,6 +6,11 @@ import React from "react";
 import { CoinOverviewFallback } from "./fallback";
 import CandlestickChart from "../CandlestickChart";
 
+/**
+ * Render an overview for Bitcoin including its image, symbol, current USD price, and a one-day candlestick chart.
+ *
+ * @returns A React element containing the coin overview with candlestick chart when data loads successfully, or the fallback component if fetching fails.
+ */
 export async function CoinOverview() {
   try {
     const [coin, coinOHLCData] = await Promise.all([

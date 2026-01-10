@@ -6,6 +6,16 @@ import { CandlestickSeries, createChart, IChartApi, ISeriesApi } from "lightweig
 import { it } from "node:test";
 import { startTransition, use, useEffect, useRef, useState, useTransition } from "react";
 
+/**
+ * Renders an interactive candlestick chart for a coin, managing period selection, data fetching, and responsive resizing.
+ *
+ * @param children - Elements rendered alongside the chart UI.
+ * @param data - Initial OHLC data array where each entry is [timestamp_ms, open, high, low, close].
+ * @param coinId - Coin identifier used to fetch OHLC data.
+ * @param height - Chart height in pixels.
+ * @param initialPeriod - Initial period key used to select the data range (for example, "daily").
+ * @returns The component's JSX element.
+ */
 export default function CandlestickChart({
   children,
   data,

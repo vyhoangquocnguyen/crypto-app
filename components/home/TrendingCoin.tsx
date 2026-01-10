@@ -47,6 +47,13 @@ const columns: DataTableColumn<TrendingCoin>[] = [
     },
   },
 ];
+/**
+ * Render a section showing currently trending cryptocurrencies in a compact table.
+ *
+ * Fetches trending coin data and displays up to six coins with name, 24-hour change, and price.
+ *
+ * @returns A React element containing a heading and a DataTable of up to six trending coins, or a fallback UI if fetching the data fails.
+ */
 export async function TrendingCoin() {
   let trendingCoins;
   try {
