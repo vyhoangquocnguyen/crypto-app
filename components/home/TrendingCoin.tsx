@@ -48,11 +48,11 @@ const columns: DataTableColumn<TrendingCoin>[] = [
   },
 ];
 export async function TrendingCoin() {
-  let trendingCoins;
+  let trendingCoins: { coins: TrendingCoin[] };
   try {
     trendingCoins = await fetcher<{ coins: TrendingCoin[] }>("search/trending", undefined, 6000);
   } catch (error) {
-    console.log("Error fetching trending coins:", error);
+    console.error("Error fetching trending coins:", error);
     return <TrendingCoinsFallback />;
   }
   return (

@@ -3,8 +3,7 @@ import { getCandlestickConfig, getChartConfig, PERIOD_BUTTONS, PERIOD_CONFIG } f
 import { fetcher } from "@/lib/coingecko.actions";
 import { convertOHLCData } from "@/lib/utils";
 import { CandlestickSeries, createChart, IChartApi, ISeriesApi } from "lightweight-charts";
-import { it } from "node:test";
-import { startTransition, use, useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 export default function CandlestickChart({
   children,
@@ -17,10 +16,10 @@ export default function CandlestickChart({
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
 
-  const [loading, setLoading] = useState(false);
+//   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState<Period>(initialPeriod);
   const [ohclcData, setOhlcData] = useState<OHLCData[]>(data ?? []);
-  const [isPending, setIsPending] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   const fetchOHLCData = async (selectedPeriod: Period) => {
     try {
@@ -48,7 +47,7 @@ export default function CandlestickChart({
     const container = chartContainerRef.current;
     if (!container) return;
 
-    const showTime = ["daily", "weekyly", "monthly"].includes(period);
+    const showTime = ["daily", "weekly", "monthly"].includes(period);
 
     const chart = createChart(container, {
       ...getChartConfig(height, showTime),
@@ -74,7 +73,7 @@ export default function CandlestickChart({
       chartRef.current = null;
       candleSeriesRef.current = null;
     };
-  }, [height, ohclcData, period]);
+  }, [height]);
 
   useEffect(() => {
     if (!candleSeriesRef.current) return;
@@ -97,7 +96,7 @@ export default function CandlestickChart({
             key={value}
             className={period === value ? "config-button-active" : "config-button"}
             onClick={() => handlePeriodChange(value)}
-            disabled={loading}>
+            disabled={isPending}>
             {label}
           </button>
         ))}
