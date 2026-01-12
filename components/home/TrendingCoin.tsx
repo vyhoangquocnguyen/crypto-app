@@ -31,7 +31,7 @@ const columns: DataTableColumn<TrendingCoin>[] = [
       return (
         <div className={cn("price-change", isTrendingUp ? "text-green-500" : "text-red-500")}>
           <p className="flex items-center">
-            {formatPercentage(priceChange)}%
+            {formatPercentage(priceChange)}
             {isTrendingUp ? <TrendingUp width={16} height={16} /> : <TrendingDown width={16} height={16} />}
           </p>
         </div>

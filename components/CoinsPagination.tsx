@@ -33,7 +33,7 @@ export default function CoinsPagination({ currentPage, totalPages, hasMorePages 
           {pageNumber.map((page, index) => (
             <PaginationItem key={index} className="pagination-page-item">
               {page === ELLIPSIS ? (
-                <span className="ellipsis">...</span>
+                <PaginationEllipsis />
               ) : (
                 <PaginationLink
                   onClick={() => handlePageChange(page)}

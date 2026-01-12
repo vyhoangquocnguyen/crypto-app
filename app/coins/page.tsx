@@ -27,12 +27,11 @@ export default async function Page({ searchParams }: NextPageProps) {
   const columns: DataTableColumn<CoinMarketData>[] = [
     {
       header: "Rank",
-      cellClassName: "rank-cell",
+      // cellClassName: "rank-cell",
       cell: (coin) => (
-        <>
+        <Link href={`/coins/${coin.id}`} className="block">
           #{coin.market_cap_rank}
-          <Link href={`/coins/${coin.id}`} aria-label="View coin" />
-        </>
+        </Link>
       ),
     },
     {
@@ -65,7 +64,7 @@ export default async function Page({ searchParams }: NextPageProps) {
         return (
           <div className={cn("change-cell", isTrendingUp ? "text-green-500" : "text-red-500")}>
             <p className="flex items-center">
-              {formatPercentage(priceChange)}%
+              {formatPercentage(priceChange)}
               {isTrendingUp ? <TrendingUp width={16} height={16} /> : <TrendingDown width={16} height={16} />}
             </p>
           </div>
@@ -75,7 +74,7 @@ export default async function Page({ searchParams }: NextPageProps) {
     {
       header: "Market Cap",
       cellClassName: "market-cap-cell",
-      cell: (category) => formatCurrency(category.market_cap), //category.market_cap,
+      cell: (coin) => formatCurrency(coin.market_cap), //coin.market_cap,
     },
   ];
 
@@ -87,9 +86,7 @@ export default async function Page({ searchParams }: NextPageProps) {
       <div className="content">
         <h4>All Coins</h4>
 
-        <Suspense fallback={<div>Loading...</div>}>
-          <DataTable columns={columns} data={coinsData} rowKey={(_, index) => index} tableClassName="coins-table" />
-        </Suspense>
+        <DataTable columns={columns} data={coinsData} rowKey={(_, index) => index} tableClassName="coins-table" />
         <CoinsPagination currentPage={currentPage} totalPages={estimatedTotalPages} hasMorePages={hasMorePages} />
       </div>
     </main>
