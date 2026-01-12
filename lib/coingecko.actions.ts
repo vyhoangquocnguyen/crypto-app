@@ -35,5 +35,6 @@ export async function fetcher<T>(endpoint: string, params?: QueryParams, revalid
     throw new Error(`API Error ${response.status}: ${errorBody.error || response.statusText}`);
   }
 
-  return response.json();
+  const data: T = await response.json().catch(() => ({}));
+  return data;
 }
