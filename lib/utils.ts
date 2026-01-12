@@ -2,10 +2,26 @@ import { clsx, type ClassValue } from "clsx";
 import { Time } from "lightweight-charts";
 import { twMerge } from "tailwind-merge";
 
+/**
+ * Combine multiple class value inputs into a single class string with Tailwind class conflicts resolved.
+ *
+ * @param inputs - Class value inputs (strings, arrays, or objects) to be normalized and merged
+ * @returns The resulting class string with Tailwind classes deduplicated/merged
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Format a numeric value as a localized currency string or as a plain number string.
+ *
+ * If `value` is `null`, `undefined`, or `NaN`, returns `"$0.00"` when `showSymbol` is not `false`, otherwise `"0.00"`.
+ *
+ * @param digits - Number of fraction digits to display; defaults to `2`.
+ * @param currency - ISO currency code (e.g., `"USD"`); defaults to `"USD"`.
+ * @param showSymbol - When `false`, omit the currency symbol and format as a plain number; defaults to `true`.
+ * @returns A localized string representing the formatted value; includes a currency symbol when `showSymbol` is not `false`, otherwise a plain numeric string.
+ */
 export function formatCurrency(
   value: number | null | undefined,
   digits?: number,
@@ -30,6 +46,12 @@ export function formatCurrency(
   });
 }
 
+/**
+ * Formats a numeric percent change to one decimal place with a trailing percent sign.
+ *
+ * @param change - Percentage value (e.g., `1.2` for 1.2%); may be `null` or `undefined`.
+ * @returns The formatted percentage string (for example, `"1.2%"`). Returns `"0.0%"` if `change` is `null`, `undefined`, or `NaN`.
+ */
 export function formatPercentage(change: number | null | undefined): string {
   if (change === null || change === undefined || isNaN(change)) {
     return "0.0%";
@@ -38,6 +60,15 @@ export function formatPercentage(change: number | null | undefined): string {
   return `${formattedChange}%`;
 }
 
+/**
+ * Produce CSS class names and an icon identifier that reflect whether a numeric value is trending up or down.
+ *
+ * @param value - Numeric trend indicator; positive means trending up, zero or negative means trending down
+ * @returns An object with:
+ *   - `textClass`: CSS class for text color
+ *   - `bgClass`: CSS class for background color
+ *   - `iconClass`: identifier for an up or down icon
+ */
 export function trendingClasses(value: number) {
   const isTrendingUp = value > 0;
 
@@ -48,6 +79,18 @@ export function trendingClasses(value: number) {
   };
 }
 
+/**
+ * Produces a human-friendly relative time string for a given date.
+ *
+ * @param date - A date input (ISO string, timestamp, or Date) to compare against the current time
+ * @returns A relative time string:
+ * - `"just now"` for under 60 seconds
+ * - `"{N} min"` for under 60 minutes
+ * - `"{N} hour"` or `"{N} hours"` for under 24 hours
+ * - `"{N} day"` or `"{N} days"` for under 7 days
+ * - `"{N} week"` or `"{N} weeks"` for under 4 weeks
+ * - a date in `YYYY-MM-DD` format for older timestamps
+ */
 export function timeAgo(date: string | number | Date): string {
   const now = new Date();
   const past = new Date(date);
@@ -69,6 +112,12 @@ export function timeAgo(date: string | number | Date): string {
   return past.toISOString().split("T")[0];
 }
 
+/**
+ * Converts an array of OHLC tuples into objects compatible with lightweight-charts and removes consecutive entries with identical timestamps.
+ *
+ * @param data - Array of OHLC tuples in the form `[timeSec, open, high, low, close]` where `timeSec` is a unix timestamp in seconds.
+ * @returns An array of objects with properties `time`, `open`, `high`, `low`, and `close`. Consecutive entries that share the same `time` are removed (only the first is kept). The `time` value is cast to `Time`.
+ */
 export function convertOHLCData(data: OHLCData[]) {
   return data
     .map((d) => ({
