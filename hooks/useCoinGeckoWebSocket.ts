@@ -107,14 +107,14 @@ export function useCoinGeckoWebSocket({
         identifier: JSON.stringify({ channel }),
       });
 
-     if (data) {
+      if (data) {
         send({
           command: "message",
           identifier: JSON.stringify({ channel }),
           data: JSON.stringify(data),
         });
       }
-
+    };
     queueMicrotask(() => {
       setPrice(null);
       setTrades([]);
@@ -125,22 +125,20 @@ export function useCoinGeckoWebSocket({
         coin_id: coinId,
         action: "set_tokens",
       });
-    
 
-      const poolAddress = poolId.replace("_", ":");
-      
       if (poolId) {
-       subscribe("OnchainTrade", {
-         "network_id:pool_addresses": [poolAddress],
+        const poolAddress = poolId.replace("_", ":");
+        subscribe("OnchainTrade", {
+          "network_id:pool_addresses": [poolAddress],
+          action: "set_pools",
         });
-         action: "set_pools",
-       subscribe("OnchainOHLCV", {
-         "network_id:pool_addresses": [poolAddress],
-         interval: liveInterval,
-       action: "set_pools",
-       });
-     }
-   });
+        subscribe("OnchainOHLCV", {
+          "network_id:pool_addresses": [poolAddress],
+          interval: liveInterval,
+          action: "set_pools",
+        });
+      }
+    });
   }, [coinId, poolId, liveInterval, isWsReady]);
 
   return {
