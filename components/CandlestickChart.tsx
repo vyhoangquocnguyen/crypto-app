@@ -116,12 +116,11 @@ export default function CandlestickChart({
 
     const converted = convertOHLCData(merged);
     candleSeriesRef.current.setData(converted);
-    chartRef.current?.timeScale().fitContent();
 
     const dataChange = prevOhlcDataLength.current !== merged.length;
-    if (dataChange || mode == "historical") {
+    if (dataChange || mode === "historical") {
       chartRef.current?.timeScale().fitContent();
-      prevOhlcDataLength.current = ohclcData.length;
+      prevOhlcDataLength.current = merged.length;
     }
   }, [ohclcData, period, liveOhlcv, mode, data]);
   return (

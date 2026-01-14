@@ -10,7 +10,7 @@ export function useCoinGeckoWebSocket({
   liveInterval,
 }: UseCoinGeckoWebSocketProps): UseCoinGeckoWebSocketReturn {
   const wsRef = useRef<WebSocket | null>(null);
-  const subscribed = useRef(<Set<string>>new Set());
+  const subscribed = useRef<Set<string>>(new Set());
 
   const [price, setPrice] = useState<ExtendedPriceData | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
@@ -32,8 +32,12 @@ export function useCoinGeckoWebSocket({
       }
 
       if (msg.type === "confirm_subscription") {
-        const { channel } = JSON.parse(msg?.identifier ?? "");
-        subscribed.current.add(channel);
+        try {
+          const { channel } = JSON.parse(msg?.identifier ?? "{}");
+          if (channel) subscribed.current.add(channel);
+        } catch {
+          console.warn("Failed to parse subscription identifier:", msg?.identifier);
+        }
       }
 
       if (msg.c === "C1") {
@@ -103,14 +107,13 @@ export function useCoinGeckoWebSocket({
         identifier: JSON.stringify({ channel }),
       });
 
-      if (data) {
+     if (data) {
         send({
-          comcommand: "message",
+          command: "message",
           identifier: JSON.stringify({ channel }),
           data: JSON.stringify(data),
         });
       }
-    };
 
     queueMicrotask(() => {
       setPrice(null);
@@ -122,21 +125,22 @@ export function useCoinGeckoWebSocket({
         coin_id: coinId,
         action: "set_tokens",
       });
-    });
+    
 
-    const poolAddress = poolId.replace("_", ":");
-
-    if (poolAddress) {
-      subscribe("OnchainTrade", {
-        "network_id:pool_addresses": [poolAddress],
-        action: "set_pools",
-      });
-      subscribe("OnchainOHLCV", {
-        "network_id:pool_addresses": [poolAddress],
-        interval: liveInterval,
-        action: "set_pools",
-      });
-    }
+      const poolAddress = poolId.replace("_", ":");
+      
+      if (poolId) {
+       subscribe("OnchainTrade", {
+         "network_id:pool_addresses": [poolAddress],
+        });
+         action: "set_pools",
+       subscribe("OnchainOHLCV", {
+         "network_id:pool_addresses": [poolAddress],
+         interval: liveInterval,
+       action: "set_pools",
+       });
+     }
+   });
   }, [coinId, poolId, liveInterval, isWsReady]);
 
   return {

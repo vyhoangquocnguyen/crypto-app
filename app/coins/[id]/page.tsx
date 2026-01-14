@@ -22,11 +22,15 @@ export default async function Page({ params }: NextPageProps) {
 
   const platform = coinData.asset_platform_id ? coinData.detail_platforms?.[coinData.asset_platform_id] : null;
 
-  const network = platform?.geckoterminal_url.split("/")[3] || null;
+  const network = platform?.geckoterminal_url.split("/")[3] ?? null;
 
   const contractAddress = platform?.contract_address || null;
 
   const pool = await getPools(id, network, contractAddress);
+
+  if (!pool) {
+    return <div>Pool data unavailable</div>;
+  }
 
   const coinDetails = [
     {
@@ -38,7 +42,7 @@ export default async function Page({ params }: NextPageProps) {
       value: `# ${coinData.market_cap_rank}`,
     },
     {
-      label: "Total Valume",
+      label: "Total Volume",
       value: formatCurrency(coinData.market_data.total_volume.usd),
     },
     {
