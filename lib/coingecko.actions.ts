@@ -38,3 +38,34 @@ export async function fetcher<T>(endpoint: string, params?: QueryParams, revalid
   const data: T = await response.json().catch(() => ({}));
   return data;
 }
+
+export async function getPools(
+  id: string,
+  network?: string | null,
+  contractAddress?: string | null
+): Promise<PoolData> {
+  const fallback: PoolData = {
+    id: "",
+    address: "",
+    name: "",
+    network: "",
+  };
+
+  if (network && contractAddress) {
+    try {
+      const poolData = await fetcher<{ data: PoolData[] }>(
+        `/onchain/networks/${network}/tokens/${contractAddress}/pools`
+      );
+      return poolData.data?.[0] ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  try {
+    const poolData = await fetcher<{ data: PoolData[] }>("/onchain/search/pools", { query: id });
+
+    return poolData.data?.[0] ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
