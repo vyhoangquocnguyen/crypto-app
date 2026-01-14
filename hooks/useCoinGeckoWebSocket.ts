@@ -75,7 +75,8 @@ export function useCoinGeckoWebSocket({
     };
     ws.onmessage = handleMessage;
 
-    ws.onclose = () => {
+    ws.onclose = (error) => {
+      console.log("WebSocket closed:", error)
       setIsWsReady(false);
     };
     return () => {
@@ -127,7 +128,7 @@ export function useCoinGeckoWebSocket({
       });
 
       if (poolId) {
-        const poolAddress = poolId.replace("_", ":");
+        const poolAddress = poolId?.replace("_", ":") ?? "";
         subscribe("OnchainTrade", {
           "network_id:pool_addresses": [poolAddress],
           action: "set_pools",
