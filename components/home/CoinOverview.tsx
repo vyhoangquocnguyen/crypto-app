@@ -21,7 +21,7 @@ export async function CoinOverview() {
 
     return (
       <div id="coin-overview">
-        <CandlestickChart data={coinOHLCData} coinId={coin.id}>
+        <CandlestickChart data={coinOHLCData} coinId={coin.id} >
           <div className="header p-2">
             <Image src={coin.image.large} alt={coin.name} width={56} height={56} />
             <div className="info">
