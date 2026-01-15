@@ -1,8 +1,10 @@
 "use client";
 import { cn } from "@/lib/utils";
+import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import SearchModal from "./SearchModal";
 
 export default function Header() {
   const pathname = usePathname();
@@ -22,6 +24,7 @@ export default function Header() {
             Home
           </Link>
           {/* Search Modal */}
+          <SearchModal />
           <Link
             href="/coins"
             className={cn("nav-link", {
