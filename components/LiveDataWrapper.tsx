@@ -31,7 +31,7 @@ export default function LiveDataWrapper({ coinId, coin, coinOHLCData }: LiveData
       binanceData.price
     : {
         usd: coin.market_data.current_price.usd,
-        change24h: coin.market_data.price_change_24h_in_currency.usd,
+        change24h: coin.market_data.price_change_percentage_24h_in_currency.usd,
       };
   const error = canUseBinance ? binanceData.error : null;
 
