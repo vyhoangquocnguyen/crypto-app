@@ -47,36 +47,40 @@ export function useBinanceWebSocket({ symbol, interval }: UseBinanceWebSocketPro
       };
 
       ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        const data = message.data;
-        //   PRICE
-        if (data?.e === "24hrTicker") {
-          setPrice({
-            coin: symbol,
-            usd: Number(data.c),
-            price: Number(data.c),
-            change24h: Number(data.p),
-            volume24h: Number(data.v),
-            timestamp: data.E,
-          });
-        }
+        try {
+          const message = JSON.parse(event.data);
+          const data = message.data;
+          //   PRICE
+          if (data?.e === "24hrTicker") {
+            setPrice({
+              coin: symbol,
+              usd: Number(data.c),
+              price: Number(data.c),
+              change24h: Number(data.p),
+              volume24h: Number(data.v),
+              timestamp: data.E,
+            });
+          }
 
-        // TRADES
-        if (data?.e === "trade") {
-          const newtrade: Trade = {
-            price: Number(data.p),
-            amount: Number(data.q),
-            value: Number(data.p) * Number(data.q),
-            timestamp: data.T,
-            type: data.m ? "s" : "b",
-          };
-          setTrades((prevTrade) => [newtrade, ...prevTrade].slice(0, 7));
-        }
+          // TRADES
+          if (data?.e === "trade") {
+            const newtrade: Trade = {
+              price: Number(data.p),
+              amount: Number(data.q),
+              value: Number(data.p) * Number(data.q),
+              timestamp: data.T,
+              type: data.m ? "s" : "b",
+            };
+            setTrades((prevTrade) => [newtrade, ...prevTrade].slice(0, 7));
+          }
 
-        // OHLCV
-        if (data?.e === "kline") {
-          const k = data.k;
-          setOhlcv([k.t, Number(k.o), Number(k.h), Number(k.l), Number(k.c)]);
+          // OHLCV
+          if (data?.e === "kline") {
+            const k = data.k;
+            setOhlcv([k.t, Number(k.o), Number(k.h), Number(k.l), Number(k.c)]);
+          }
+        } catch (error) {
+          console.error(`Failed to parse WebSocket message for ${symbol}:`, error, event.data);
         }
       };
 

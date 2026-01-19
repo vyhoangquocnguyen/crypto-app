@@ -74,8 +74,10 @@ export async function getPools(
 
 export async function searchCoins(query: string): Promise<SearchCoin[]> {
   try {
-    const coins = await fetcher<{ coins: SearchCoin[] }>(`/search?query=${query}`);
-    const binanceSymbols = await getBinanceSymbols();
+    const [coins, binanceSymbols] = await Promise.all([
+      fetcher<{ coins: SearchCoin[] }>("/search", { query }),
+      getBinanceSymbols(),
+    ]);
 
     return coins.coins.map((coin) => {
       const candidate = `${coin.symbol.toUpperCase()}USDT`;

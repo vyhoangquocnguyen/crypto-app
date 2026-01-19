@@ -1,7 +1,5 @@
 "use server";
 
-import qs from "query-string";
-import { fetcher } from "./coingecko.actions";
 const BASE_URL = process.env.BINANCE_BASE_URL;
 
 if (!BASE_URL) {
@@ -10,16 +8,14 @@ if (!BASE_URL) {
 
 export async function getBinanceSymbols(): Promise<Set<string>> {
   const res = await fetch(`${BASE_URL}/exchangeInfo`, {
-    next: { revalidate: 60 * 60 }, // cach 1 hour
+    next: { revalidate: 60 * 60 }, // cache 1 hour
   });
 
   if (!res.ok) {
     throw new Error("Failed to fetch binance symbols");
   }
 
-  const data: BinanceExchangeInforResponse = await res.json();
+  const data: BinanceExchangeInfoResponse = await res.json();
 
   return new Set(data.symbols.filter((s) => s.quoteAsset === "USDT" && s.status === "TRADING").map((s) => s.symbol));
 }
-
-
