@@ -18,6 +18,20 @@ export default async function Page({ params }: NextPageProps) {
     }),
   ]);
 
+  if (!coinData) {
+    return (
+      <div className="container mx-auto p-10 text-center">
+        <h1 className="text-2xl font-bold text-red-500">Coin Not Found</h1>
+        <p className="mt-2 text-gray-400">
+          Could not fetch data for "{id}". It may be an invalid ID or the API is currently unavailable.
+        </p>
+        <Link href="/coins" className="mt-4 inline-block text-blue-400 hover:underline">
+          &larr; Back to Coins
+        </Link>
+      </div>
+    );
+  }
+
   const platform = coinData.asset_platform_id ? coinData.detail_platforms?.[coinData.asset_platform_id] : null;
 
   const network = platform?.geckoterminal_url.split("/")[3] ?? null;
@@ -80,16 +94,14 @@ export default async function Page({ params }: NextPageProps) {
               <li key={index}>
                 <p className={label}>{label}</p>
 
-                {link ? (
+                {link ?
                   <div className="link">
                     <Link href={link} target="_blank">
                       {linkText || label}
                     </Link>
                     <ArrowUpRight size={16} />
                   </div>
-                ) : (
-                  <p className="text-base font-medium">{value}</p>
-                )}
+                : <p className="text-base font-medium">{value}</p>}
               </li>
             ))}
           </ul>
