@@ -1,6 +1,7 @@
 "use server";
 
 import qs from "query-string";
+import { getBinanceSymbols } from "./binance.actions";
 
 const BASE_URL = process.env.COINGECKO_BASE_URL;
 const API_KEY = process.env.COINGECKO_API_KEY;
@@ -71,12 +72,35 @@ export async function getPools(
   }
 }
 
-export async function searchCoin(query: string): Promise<SearchCoin[]> { 
+export async function searchCoins(query: string): Promise<SearchCoin[]> {
   try {
     const coins = await fetcher<{ coins: SearchCoin[] }>(`/search?query=${query}`);
-    return coins.coins;
+    const binanceSymbols = await getBinanceSymbols();
+
+    return coins.coins.map((coin) => {
+      const candidate = `${coin.symbol.toUpperCase()}USDT`;
+      return {
+        ...coin,
+        binanceSymbol: binanceSymbols.has(candidate) ? candidate : undefined,
+      };
+    });
   } catch (error) {
     console.log(error);
-    return [ ];
+    return [];
   }
+}
+
+export async function getCoinById(id: string): Promise<CoinDetailsData> {
+  const [coinData, binanceSymbols] = await Promise.all([
+    fetcher<CoinDetailsData>(`/coins/${id}`, {
+      dex_pair_format: "contract_address",
+    }),
+    getBinanceSymbols(),
+  ]);
+
+  const candidate = `${coinData.symbol.toUpperCase()}USDT`;
+  return {
+    ...coinData,
+    binanceSymbol: binanceSymbols.has(candidate) ? candidate : undefined,
+  };
 }

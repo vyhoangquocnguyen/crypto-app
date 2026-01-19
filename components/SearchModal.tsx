@@ -1,5 +1,5 @@
 "use client";
-import { searchCoin } from "@/lib/coingecko.actions";
+import { searchCoins } from "@/lib/coingecko.actions";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import {
@@ -78,7 +78,7 @@ export default function SearchModal({ initialTrendingCoins = [] }: { initialTren
 
   const { data: searchResults = [], isValidating: isSearching } = useSWR<SearchCoin[]>(
     debouncedQuery ? ["coin-search", debouncedQuery] : null,
-    ([, query]) => searchCoin(query as string),
+    ([, query]) => searchCoins(query as string),
     {
       revalidateOnFocus: false,
     }

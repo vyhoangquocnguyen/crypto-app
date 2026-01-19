@@ -90,6 +90,7 @@ interface SearchCoin {
   market_cap_rank: number | null;
   thumb: string;
   large: string;
+  binanceSymbol?: string;
   data: {
     price?: number;
     price_change_percentage_24h: number;
@@ -177,6 +178,7 @@ interface CoinDetailsData {
   id: string;
   name: string;
   symbol: string;
+  binanceSymbol?: string;
   asset_platform_id?: string | null;
   detail_platforms?: Record<
     string,
@@ -260,6 +262,18 @@ interface UseCoinGeckoWebSocketReturn {
   isConnected: boolean;
 }
 
+interface UseBinanceWebSocketProps {
+  symbol: string;
+  interval: string;
+}
+
+interface UseBinanceWebSocketReturn {
+  price: ExtendedPriceData | null;
+  trades: Trade[];
+  ohlcv: OHLCData | null;
+  isConnected: boolean;
+}
+
 interface DataTableColumn<T> {
   header: React.ReactNode;
   cell: (row: T, index: number) => React.ReactNode;
@@ -315,4 +329,15 @@ interface PoolData {
   address: string;
   name: string;
   network: string;
+}
+
+interface BinanceSymbol {
+  symbol: string;
+  status: "TRADING" | "BREAK";
+  baseAsset: string;
+  quoteAsset: string;
+}
+
+interface BinanceExchangeInforResponse {
+  symbols: BinanceSymbol[];
 }
