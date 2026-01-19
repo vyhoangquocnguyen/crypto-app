@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WS Test</title>
+  </head>
+  <body>
+    <h1>WebSocket Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="log"></div>
+
+    <script>
+      const logDiv = document.getElementById("log");
+      const statusDiv = document.getElementById("status");
+
+      function log(msg) {
+        const p = document.createElement("div");
+        p.textContent = msg;
+        logDiv.appendChild(p);
+        console.log(msg);
+      }
+
+      // Test with BTCUSDT and 1s interval as seen in the code/logs
+      const symbol = "btcusdt";
+      const streams = [`${symbol}@ticker`, `${symbol}@trade`, `${symbol}@kline_1s`].join("/");
+
+      const url = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+      log(`Connecting to: ${url}`);
+
+      try {
+        const ws = new WebSocket(url);
+
+        ws.onopen = () => {
+          statusDiv.textContent = "Connected";
+          log("WebSocket Connected!");
+        };
+
+        ws.onmessage = (event) => {
+          log("Received message: " + event.data.substring(0, 100) + "...");
+          // We want to see at least one message to confirm data flow
+          ws.close();
+        };
+
+        ws.onerror = (error) => {
+          statusDiv.textContent = "Error";
+          log("WebSocket Error (check console)");
+          console.error("WebSocket Error Object:", error);
+        };
+
+        ws.onclose = () => {
+          log("WebSocket Closed");
+        };
+      } catch (e) {
+        log("Exception: " + e.message);
+      }
+    </script>
+  </body>
+</html>

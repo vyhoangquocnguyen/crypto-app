@@ -272,6 +272,7 @@ interface UseBinanceWebSocketReturn {
   trades: Trade[];
   ohlcv: OHLCData | null;
   isConnected: boolean;
+  error: string | null;
 }
 
 interface DataTableColumn<T> {
