@@ -56,7 +56,7 @@ export function useBinanceWebSocket({ symbol, interval }: UseBinanceWebSocketPro
               coin: symbol, // Keep original symbol casing for UI if needed, or use binanceSymbol
               usd: Number(data.c),
               price: Number(data.c),
-              change24h: Number(data.p),
+              change24h: Number(data.P),
               volume24h: Number(data.v),
               timestamp: data.E,
             });
