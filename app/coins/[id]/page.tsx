@@ -1,6 +1,6 @@
 import Link from "next/link";
 import LiveDataWrapper from "@/components/LiveDataWrapper";
-import { fetcher, getPools } from "@/lib/coingecko.actions";
+import { fetcher, getCoinById, getPools } from "@/lib/coingecko.actions";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Converter from "@/components/Converter";
@@ -9,9 +9,7 @@ export default async function Page({ params }: NextPageProps) {
   const { id } = await params;
 
   const [coinData, coinOHLCData] = await Promise.all([
-    fetcher<CoinDetailsData>(`/coins/${id}`, {
-      dex_pair_format: "contract_address",
-    }),
+    getCoinById(id),
     fetcher<OHLCData[]>(`/coins/${id}/ohlc`, {
       vs_currency: "usd",
       days: 1,
@@ -67,9 +65,7 @@ export default async function Page({ params }: NextPageProps) {
   return (
     <main id="coin-details-page">
       <section className="primary">
-        <LiveDataWrapper coinId={id} poolId={pool.id} coin={coinData} coinOHLCData={coinOHLCData}>
-          <h4>Exchange Listing</h4>
-        </LiveDataWrapper>
+        <LiveDataWrapper coinId={id} poolId={pool.id} coin={coinData} coinOHLCData={coinOHLCData} />
       </section>
       <section className="secondary">
         <Converter

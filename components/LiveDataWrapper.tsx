@@ -1,17 +1,34 @@
 "use client";
 
+import { useState } from "react";
 import { Separator } from "./ui/separator";
 import CandlestickChart from "./CandlestickChart";
-import { useCoinGeckoWebSocket } from "@/hooks/useCoinGeckoWebSocket";
 import DataTable from "./DataTable";
-import { formatCurrency, timeAgo } from "@/lib/utils";
-import { useState } from "react";
 import CoinHeader from "./CoinHeader";
+import { formatCurrency, timeAgo } from "@/lib/utils";
+import { useBinanceWebSocket } from "@/hooks/useBinanceWebsocket";
+// import { useCoinGeckoWebSocket } from "@/hooks/useCoinGeckoWebSocket";
 
-export default function LiveDataWrapper({ children, coinId, poolId, coin, coinOHLCData }: LiveDataProps) {
+export default function LiveDataWrapper({  coinId, poolId, coin, coinOHLCData }: LiveDataProps) {
   const [liveInterval, setLiveInterval] = useState<"1s" | "1m">("1s");
 
-  const { trades, ohlcv, price } = useCoinGeckoWebSocket({ coinId, poolId, liveInterval });
+  // const { trades, ohlcv, price } = useCoinGeckoWebSocket({ coinId, poolId, liveInterval });
+
+  const canUseBinance = Boolean(coin.binanceSymbol);
+
+  const binanceData = useBinanceWebSocket({
+    symbol: coin.binanceSymbol ?? "",
+    interval: liveInterval === "1s" ? "1s" : "1m",
+  });
+
+  const trades = canUseBinance ? binanceData.trades : [];
+  const ohlcv = canUseBinance ? binanceData.ohlcv : null;
+  const price = canUseBinance
+    ? binanceData.price
+    : {
+        usd: coin.market_data.current_price.usd,
+        change24h: coin.market_data.price_change_24h_in_currency.usd,
+      };
 
   const tradeColumns: DataTableColumn<Trade>[] = [
     {
@@ -47,6 +64,7 @@ export default function LiveDataWrapper({ children, coinId, poolId, coin, coinOH
 
   return (
     <section id="live-data-wrapper">
+      {/* {children} */}
       <CoinHeader
         name={coin.name}
         image={coin.image.large}
