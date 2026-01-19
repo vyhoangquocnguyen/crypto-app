@@ -1,17 +1,39 @@
 "use client";
 
+import { useState } from "react";
 import { Separator } from "./ui/separator";
 import CandlestickChart from "./CandlestickChart";
-import { useCoinGeckoWebSocket } from "@/hooks/useCoinGeckoWebSocket";
 import DataTable from "./DataTable";
-import { formatCurrency, timeAgo } from "@/lib/utils";
-import { useState } from "react";
 import CoinHeader from "./CoinHeader";
+import { formatCurrency, timeAgo } from "@/lib/utils";
+import { useBinanceWebSocket } from "@/hooks/useBinanceWebsocket";
+// import { useCoinGeckoWebSocket } from "@/hooks/useCoinGeckoWebSocket";
 
-export default function LiveDataWrapper({ children, coinId, poolId, coin, coinOHLCData }: LiveDataProps) {
-  const [liveInterval, setLiveInterval] = useState<"1s" | "1m">("1s");
+export default function LiveDataWrapper({ coinId, coin, coinOHLCData }: LiveDataProps) {
+  // Binance only supports 1m+, so we default to 1m.
+  // Ideally, if we support other providers (CoinGecko) that allow 1s, we might make this dynamic.
+  // const [liveInterval, setLiveInterval] = useState<"5m" | "1m">("1m");
 
-  const { trades, ohlcv, price } = useCoinGeckoWebSocket({ coinId, poolId, liveInterval });
+  // const { trades, ohlcv, price } = useCoinGeckoWebSocket({ coinId, poolId, liveInterval });
+
+  const canUseBinance = Boolean(coin.binanceSymbol);
+
+  const binanceData = useBinanceWebSocket({
+    symbol: coin.binanceSymbol ?? "",
+    // Force 1m if using Binance, regardless of state (though state should be 1m)
+    interval: "1m",
+  });
+
+  const trades = canUseBinance ? binanceData.trades : [];
+  const ohlcv = canUseBinance ? binanceData.ohlcv : null;
+  const price =
+    canUseBinance ?
+      binanceData.price
+    : {
+        usd: coin.market_data.current_price.usd,
+        change24h: coin.market_data.price_change_percentage_24h_in_currency.usd,
+      };
+  const error = canUseBinance ? binanceData.error : null;
 
   const tradeColumns: DataTableColumn<Trade>[] = [
     {
@@ -47,6 +69,13 @@ export default function LiveDataWrapper({ children, coinId, poolId, coin, coinOH
 
   return (
     <section id="live-data-wrapper">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-md mb-4">
+          <p className="font-bold">Live Data Connection Error</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+      {/* {children} */}
       <CoinHeader
         name={coin.name}
         image={coin.image.large}
@@ -58,14 +87,7 @@ export default function LiveDataWrapper({ children, coinId, poolId, coin, coinOH
       <Separator className="divider" />
 
       <div className="trend">
-        <CandlestickChart
-          coinId={coinId}
-          data={coinOHLCData}
-          liveOhlcv={ohlcv}
-          mode="live"
-          initialPeriod="daily"
-          liveInterval={liveInterval}
-          setLiveInterval={setLiveInterval}>
+        <CandlestickChart coinId={coinId} data={coinOHLCData} liveOhlcv={ohlcv} mode="live" initialPeriod="daily">
           <h4>Trend Overview</h4>
         </CandlestickChart>
       </div>
