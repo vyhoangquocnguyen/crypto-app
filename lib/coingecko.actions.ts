@@ -93,16 +93,21 @@ export async function searchCoins(query: string): Promise<SearchCoin[]> {
 }
 
 export async function getCoinById(id: string): Promise<CoinDetailsData> {
-  const [coinData, binanceSymbols] = await Promise.all([
-    fetcher<CoinDetailsData>(`/coins/${id}`, {
-      dex_pair_format: "contract_address",
-    }),
-    getBinanceSymbols(),
-  ]);
+  try {
+    const [coinData, binanceSymbols] = await Promise.all([
+      fetcher<CoinDetailsData>(`/coins/${id}`, {
+        dex_pair_format: "contract_address",
+      }),
+      getBinanceSymbols(),
+    ]);
 
-  const candidate = `${coinData.symbol.toUpperCase()}USDT`;
-  return {
-    ...coinData,
-    binanceSymbol: binanceSymbols.has(candidate) ? candidate : undefined,
-  };
+    const candidate = `${coinData.symbol.toUpperCase()}USDT`;
+    return {
+      ...coinData,
+      binanceSymbol: binanceSymbols.has(candidate) ? candidate : undefined,
+    };
+  } catch (error) {
+    console.error(`Failed to fetch coin data for ${id}:`, error);
+    throw error;
+  }
 }
